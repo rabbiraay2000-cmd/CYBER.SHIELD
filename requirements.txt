@@ -1,0 +1,4 @@
+scapy>=2.5.0
+networkx>=3.2
+flask>=3.0
+gunicorn>=21.0

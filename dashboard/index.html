@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head><title>Cyber Shield</title>
+<style>
+body{font-family:Arial;background:#0f172a;color:#fff;text-align:center}
+.card{background:#1e293b;margin:20px auto;padding:20px;max-width:600px;border-radius:12px}
+.alert{background:#7f1d1d;padding:10px;margin:8px;border-radius:8px}
+.ok{background:#14532d;padding:10px;margin:8px;border-radius:8px}
+button{padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:8px;cursor:pointer}
+</style></head>
+<body>
+<h1>🛡️ Cyber Shield</h1>
+<p>Live network threat detection (graph-based)</p>
+<div class="card"><h3>Network Graph</h3><p id="stats">loading...</p>
+<button onclick="load()">Refresh</button></div>
+<div class="card"><h3>Alerts</h3><div id="alerts">loading...</div></div>
+<script>
+async function load(){
+  const s=await (await fetch('/api/status')).json();
+  document.getElementById('stats').innerText=`Nodes: ${s.nodes} | Edges: ${s.edges}`;
+  const a=await (await fetch('/api/alerts')).json();
+  document.getElementById('alerts').innerHTML=a.length?
+    a.map(x=>`<div class="alert">⚠️ [${x.type}] ${x.ip} — ${x.reason}</div>`).join(''):
+    '<div class="ok">✅ No threats</div>';
+}
+load(); setInterval(load,3000);
+</script>
+</body></html>
