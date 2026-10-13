@@ -7,7 +7,8 @@ from flask import Flask, jsonify, render_template
 import sniffer
 from sniffer import start_live_capture
 
-app = Flask(__name__, template_folder="../dashboard")
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+app = Flask(__name__, template_folder=os.path.join(BASE, "dashboard"))
 graph = sniffer.graph  # same graph object the capture feeds
 
 
@@ -35,6 +36,11 @@ def status():
 def alerts():
     return jsonify([{"ip": ip, "type": k, "reason": r}
                     for ip, k, r in graph.detect()])
+
+
+@app.route("/api/health")
+def health():
+    return jsonify({"status": "ok", "service": "cyber-shield"})
 
 
 if __name__ == "__main__":
