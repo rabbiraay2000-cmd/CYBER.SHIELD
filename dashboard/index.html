@@ -6,46 +6,74 @@
 <title>Cyber Shield — Network Threat Detection</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
-body{background:linear-gradient(135deg,#0f172a,#1e1b4b);color:#fff;min-height:100vh}
-header{background:rgba(0,0,0,.35);padding:16px 32px;display:flex;align-items:center;gap:12px}
-header .logo{font-size:28px}
-header h1{font-size:20px}
-header span{color:#93c5fd;font-size:13px}
-main{max-width:720px;margin:32px auto;padding:0 16px}
-.card{background:#fff;color:#0f172a;padding:24px;border-radius:16px;margin-bottom:20px;box-shadow:0 10px 25px rgba(0,0,0,.3)}
-.card h3{margin-bottom:12px}
-.stats{display:flex;gap:12px;margin-bottom:12px}
-.stat{flex:1;background:#f1f5f9;border-radius:10px;padding:12px}
-.stat b{font-size:22px;display:block}
-.alert{background:#fee2e2;color:#991b1b;padding:10px;margin:8px 0;border-radius:8px;font-size:14px}
-.ok{background:#dcfce7;color:#166534;padding:10px;margin:8px 0;border-radius:8px}
-button{padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600}
-footer{text-align:center;color:#64748b;font-size:12px;padding:20px}
-.live{display:inline-block;width:10px;height:10px;background:#22c55e;border-radius:50%;margin-right:6px;animation:blink 1.5s infinite}
+body{background:#0b1220;color:#e2e8f0;min-height:100vh}
+nav{background:rgba(0,0,0,.5);padding:14px 32px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;border-bottom:1px solid #1e293b}
+nav .logo{font-size:26px}
+nav h1{font-size:19px}
+nav .tag{margin-left:auto;font-size:12px;color:#93c5fd}
+.live{display:inline-block;width:9px;height:9px;background:#22c55e;border-radius:50%;margin-right:6px;animation:blink 1.5s infinite}
 @keyframes blink{50%{opacity:.3}}
+main{max-width:1000px;margin:0 auto;padding:28px 16px}
+.hero{text-align:center;margin-bottom:24px}
+.hero h2{font-size:30px;margin-bottom:8px}
+.hero p{color:#94a3b8}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.stat{background:#151f32;border:1px solid #243049;border-radius:14px;padding:18px;text-align:center}
+.stat b{font-size:28px;display:block;color:#60a5fa}
+.stat span{font-size:12px;color:#94a3b8;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}}
+.panel{background:#151f32;border:1px solid #243049;border-radius:14px;padding:18px}
+.panel h3{margin-bottom:12px;font-size:16px}
+#net{width:100%;height:340px;background:#0b1220;border-radius:10px}
+.alert{background:rgba(239,68,68,.15);border:1px solid #ef4444;color:#fca5a5;padding:10px;margin:8px 0;border-radius:8px;font-size:13px}
+.ok{background:rgba(34,197,94,.12);border:1px solid #22c55e;color:#86efac;padding:10px;border-radius:8px;font-size:14px}
+.legend{font-size:12px;color:#94a3b8;margin-top:8px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 4px 0 12px}
+footer{text-align:center;color:#475569;font-size:12px;padding:24px}
 </style></head>
 <body>
-<header><div class="logo">🛡️</div>
-<div><h1>Cyber Shield</h1><span><span class="live"></span>LIVE — Graph-based Network Threat Detection</span></div>
-</header>
+<nav><div class="logo">🛡️</div>
+<div><h1>Cyber Shield</h1></div>
+<div class="tag"><span class="live"></span>LIVE MONITORING</div></nav>
 <main>
-<div class="card"><h3>Network Graph</h3>
-<div class="stats"><div class="stat"><b id="nodes">–</b>Nodes (IPs)</div>
-<div class="stat"><b id="edges">–</b>Edges (Flows)</div></div>
-<button onclick="load()">Refresh Now</button></div>
-<div class="card"><h3>Threat Alerts</h3><div id="alerts">loading...</div></div>
+<div class="hero"><h2>Network Threat Detection</h2>
+<p>Graph-powered security monitor — IPs are nodes, traffic flows are edges</p></div>
+<div class="stats">
+<div class="stat"><b id="nodes">–</b><span>IP Nodes</span></div>
+<div class="stat"><b id="edges">–</b><span>Traffic Edges</span></div>
+<div class="stat"><b id="threats">–</b><span>Active Threats</span></div>
+</div>
+<div class="grid">
+<div class="panel"><h3>Live Network Graph</h3><canvas id="net"></canvas>
+<div class="legend"><span class="dot" style="background:#60a5fa"></span>Normal<span class="dot" style="background:#ef4444"></span>Threat</div></div>
+<div class="panel"><h3>Threat Alerts</h3><div id="alerts">loading...</div></div>
+</div>
 </main>
-<footer>Cyber Shield © 2026 — College Mini Project · IPs are nodes, flows are edges</footer>
+<footer>Cyber Shield © 2026 — Real-time graph-based intrusion detection</footer>
 <script>
+function pos(id,W,H){let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))>>>0;
+return{x:40+(h%1000)/1000*(W-80),y:40+((h>>10)%1000)/1000*(H-80)};}
 async function load(){
   const s=await (await fetch('/api/status')).json();
   document.getElementById('nodes').innerText=s.nodes;
   document.getElementById('edges').innerText=s.edges;
+  document.getElementById('threats').innerText=s.threats.length;
+  const g=await (await fetch('/api/graph')).json();
+  const cv=document.getElementById('net'),ctx=cv.getContext('2d');
+  const W=cv.clientWidth,H=340;cv.width=W;cv.height=H;ctx.clearRect(0,0,W,H);
+  const P={};g.nodes.forEach(n=>P[n.id]=pos(n.id,W,H));
+  ctx.strokeStyle='#334155';g.edges.forEach(e=>{const a=P[e.src],b=P[e.dst];
+    if(!a||!b)return;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();});
+  g.nodes.forEach(n=>{const p=P[n.id];
+    ctx.fillStyle=n.threat?'#ef4444':'#60a5fa';
+    ctx.beginPath();ctx.arc(p.x,p.y,n.threat?9:6,0,7);ctx.fill();
+    ctx.fillStyle='#cbd5e1';ctx.font='10px sans-serif';ctx.fillText(n.id,p.x+10,p.y+3);});
   const a=await (await fetch('/api/alerts')).json();
   document.getElementById('alerts').innerHTML=a.length?
-    a.map(x=>`<div class="alert">⚠️ [${x.type}] ${x.ip} — ${x.reason}</div>`).join(''):
+    a.map(x=>`<div class="alert">⚠️ <b>[${x.type}]</b> ${x.ip}<br>${x.reason}</div>`).join(''):
     '<div class="ok">✅ Network clean — no threats detected</div>';
 }
-load(); setInterval(load,3000);
+load();setInterval(load,3000);
 </script>
 </body></html>
